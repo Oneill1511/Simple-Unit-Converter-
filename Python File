@@ -1,0 +1,173 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+def celsius_to_fahrenheit(celsius):
+    try:
+        celsius = float(celsius)
+        return (celsius * 9/5) + 32
+    except ValueError:
+        return None
+
+def fahrenheit_to_celsius(fahrenheit):
+    try:
+        fahrenheit = float(fahrenheit)
+        return (fahrenheit - 32) * 5/9
+    except ValueError:
+        return None
+
+def kilometers_to_miles(kilometers):
+    try:
+        kilometers = float(kilometers)
+        return kilometers * 0.621371
+    except ValueError:
+        return None
+
+def miles_to_kilometers(miles):
+    try:
+        miles = float(miles)
+        return miles * 1.60934
+    except ValueError:
+        return None
+
+def kilograms_to_pounds(kilograms):
+    try:
+        kilograms = float(kilograms)
+        return kilograms * 2.20462
+    except ValueError:
+        return None
+
+def pounds_to_kilograms(pounds):
+    try:
+        pounds = float(pounds)
+        return pounds * 0.453592
+    except ValueError:
+        return None
+
+
+def convert():
+    try:
+        choice = conversion_type.get()
+        input_value = input_entry.get()
+
+        if not input_value:
+            messagebox.showerror("Error", "Please enter a value to convert.")
+            return
+
+        result = None
+
+        if choice == "Celsius to Fahrenheit":
+            result = celsius_to_fahrenheit(input_value)
+            from_unit = "°C"
+            to_unit = "°F"
+        elif choice == "Fahrenheit to Celsius":
+            result = fahrenheit_to_celsius(input_value)
+            from_unit = "°F"
+            to_unit = "°C"
+        elif choice == "Kilometers to Miles":
+            result = kilometers_to_miles(input_value)
+            from_unit = "km"
+            to_unit = "miles"
+        elif choice == "Miles to Kilometers":
+            result = miles_to_kilometers(input_value)
+            from_unit = "miles"
+            to_unit = "km"
+        elif choice == "Kilograms to Pounds":
+            result = kilograms_to_pounds(input_value)
+            from_unit = "kg"
+            to_unit = "lbs"
+        elif choice == "Pounds to Kilograms":
+            result = pounds_to_kilograms(input_value)
+            from_unit = "lbs"
+            to_unit = "kg"
+
+        if result is not None:
+            result_label.config(text=f"{float(input_value):.2f} {from_unit} = {result:.2f} {to_unit}", font=("Arial", 14, "bold"))
+        else:
+            messagebox.showerror("Error", "Invalid input. Please enter a number.")
+
+    except ValueError:
+        messagebox.showerror("Error", "Invalid input. Please enter a valid number.")
+    except tk.TclError:
+        messagebox.showerror("Error", "An unexpected error occurred with Tkinter.")
+    except Exception as e:
+        messagebox.showerror("Error", f"An unexpected error occurred: {e}")
+
+def about():
+    messagebox.showinfo("About", "Unit Converter\nVersion 1.0\nCreated by Reuben O'Neill")
+
+def exit_application():
+    if messagebox.askokcancel("Exit", "Do you really want to exit?"):
+        window.destroy()
+
+
+def main():
+    global conversion_type, input_entry, result_label, window
+
+    window = tk.Tk()
+    window.title("Unit Converter")
+    window.geometry("450x350")
+    window.resizable(False, False)
+    window.configure(bg="#f0f0f0")
+
+    style = ttk.Style()
+    style.theme_use("clam")
+    style.configure("TLabel", background="#f0f0f0", font=("Arial", 12))
+    style.configure("TCombobox", font=("Arial", 12))
+    style.configure("TEntry", font=("Arial", 12))
+    style.configure("TButton", font=("Arial", 12), background="#4CAF50", foreground="white")
+    style.map("TButton", background=[('active', '#3e8e41')])
+    style.configure("Exit.TButton", background="#f44336", foreground="white")
+    style.map("Exit.TButton", background=[('active', '#d32f2f')])
+
+    menubar = tk.Menu(window)
+    filemenu = tk.Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Exit", command=exit_application, accelerator="Alt+F4")
+    menubar.add_cascade(label="File", menu=filemenu)
+
+    helpmenu = tk.Menu(menubar, tearoff=0)
+    helpmenu.add_command(label="About", command=about)
+    menubar.add_cascade(label="Help", menu=helpmenu)
+    window.config(menu=menubar)
+
+    main_frame = ttk.Frame(window, padding="20 20 20 20")
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    title_label = ttk.Label(main_frame, text="Unit Converter", font=("Arial", 18, "bold"))
+    title_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
+
+    conversion_type = tk.StringVar(window)
+    conversion_type.set("Celsius to Fahrenheit")
+
+    conversion_options = [
+        "Celsius to Fahrenheit",
+        "Fahrenheit to Celsius",
+        "Kilometers to Miles",
+        "Miles to Kilometers",
+        "Kilograms to Pounds",
+        "Pounds to Kilograms",
+    ]
+
+    conversion_menu = ttk.Combobox(main_frame, textvariable=conversion_type, values=conversion_options, state="readonly", width=25, font=("Arial", 12))
+    conversion_menu.grid(row=1, column=0, columnspan=2, pady=10)
+    conversion_menu.bind("<<ComboboxSelected>>", lambda event: input_entry.focus_set())
+
+    input_label = ttk.Label(main_frame, text="Enter Value:", font=("Arial", 12))
+    input_label.grid(row=2, column=0, sticky=tk.W, padx=5, pady=5)
+    input_entry = ttk.Entry(main_frame, width=15, font=("Arial", 12))
+    input_entry.grid(row=2, column=1, sticky=tk.E, padx=5, pady=5)
+    input_entry.focus_set()
+
+    convert_button = ttk.Button(main_frame, text="Convert", command=convert, width=15)
+    convert_button.grid(row=3, column=0, columnspan=2, pady=20)
+
+    result_label = ttk.Label(main_frame, text="", font=("Arial", 14, "bold"))
+    result_label.grid(row=4, column=0, columnspan=2)
+
+    exit_button = ttk.Button(main_frame, text="Exit", command=exit_application, style="Exit.TButton", width=10)
+    exit_button.grid(row=5, column=0, columnspan=2, pady=10)
+
+    window.bind("<Alt-F4>", lambda event: exit_application())
+    window.mainloop()
+
+if __name__ == "__main__":
+    main()
